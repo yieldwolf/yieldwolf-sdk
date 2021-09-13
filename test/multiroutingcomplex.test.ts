@@ -9,10 +9,8 @@ const testSeed = '2' // Change it to change random generator values
 const rnd: () => number = seedrandom(testSeed) // random [0, 1)
 
 const GAS_PRICE = 1 * 200 * 1e-9
-//const TOKEN_NUMBER = 20
 const MIN_TOKEN_PRICE = 1e-6
 const MAX_TOKEN_PRICE = 1e6
-const POOL_CP_DENSITY = 0.3
 const MIN_POOL_RESERVE = 1e9
 const MAX_POOL_RESERVE = 1e31
 const MIN_POOL_IMBALANCE = 1 / (1 + 1e-3)
@@ -47,35 +45,11 @@ function getRandom(rnd: () => number, min: number, max: number) {
 }
 
 function getTokenPrice(rnd: () => number) {
-  /*const cmd = choice(rnd, {
-        min: 0.1,
-        middle: 0.8,
-        max: 0.1,
-    })
-    switch (cmd) {
-        case 'min': return getRandom(rnd, MIN_TOKEN_PRICE, Math.min(MIN_TOKEN_PRICE*100, MAX_TOKEN_PRICE));
-        case 'middle': return getRandom(rnd, MIN_TOKEN_PRICE, MAX_TOKEN_PRICE);
-        case 'max': return getRandom(rnd, Math.max(MAX_TOKEN_PRICE/100, MIN_TOKEN_PRICE), MAX_TOKEN_PRICE);
-    }*/
   const price = getRandom(rnd, MIN_TOKEN_PRICE, MAX_TOKEN_PRICE)
   return price
 }
 
 function getPoolReserve(rnd: () => number) {
-  /*const cmd = choice(rnd, {
-        min: 0.1,
-        middle: 0.8,
-        max: 0.1,
-    })
-    switch (cmd) {
-        case 'min': return getRandom(rnd, MIN_POOL_RESERVE, Math.min(MIN_POOL_RESERVE*100, MAX_POOL_RESERVE));
-        case 'middle': return getRandom(
-            rnd, 
-            Math.max(MIDDLE_POOL_RESERVE/100, MIN_POOL_RESERVE), 
-            Math.min(MIDDLE_POOL_RESERVE*100, MAX_POOL_RESERVE)
-        );
-        case 'max': return getRandom(rnd, Math.max(MAX_POOL_RESERVE/100, MIN_POOL_RESERVE), MAX_POOL_RESERVE);
-    }*/
   return getRandom(rnd, MIN_POOL_RESERVE, MAX_POOL_RESERVE)
 }
 
@@ -138,7 +112,7 @@ interface Network {
   gasPrice: number
 }
 
-function createNetwork(rnd: () => number, tokenNumber: number): Network {
+function createNetwork(rnd: () => number, tokenNumber: number, density: number): Network {
   const tokens = []
   const prices = []
   for (var i = 0; i < tokenNumber; ++i) {
@@ -150,14 +124,22 @@ function createNetwork(rnd: () => number, tokenNumber: number): Network {
   for (i = 0; i < tokenNumber; ++i) {
     for (var j = i + 1; j < tokenNumber; ++j) {
       const r = rnd()
-      if (r < POOL_CP_DENSITY) {
+      if (r < density) {
         pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
-      if (r < POOL_CP_DENSITY * POOL_CP_DENSITY) {
+      if (r < density * density) {
         // second pool
         pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
-      if (r < POOL_CP_DENSITY * POOL_CP_DENSITY * POOL_CP_DENSITY) {
+      if (r < density * density * density) {
+        // third pool
+        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+      }
+      if (r < Math.pow(density, 4)) {
+        // third pool
+        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+      }
+      if (r < Math.pow(density, 5)) {
         // third pool
         pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
@@ -338,7 +320,16 @@ function exportNetwork(network: Network, from: RToken, to: RToken, route: MultiR
   fs.writeFileSync('D:/Info/Notes/GraphVisualization/data.js', nodes + edges + data)
 }
 
-const network = createNetwork(rnd, 20)
+function chooseRandomTokens(network: Network): [RToken, RToken, RToken] {
+  const num = network.tokens.length
+  const token0 = Math.floor(rnd() * num)
+  const token1 = (token0 + 1 + Math.floor(rnd() * (num - 1))) % num
+  expect(token0).not.toEqual(token1)
+  const tokenBase = Math.floor(rnd() * num)
+  return [network.tokens[token0], network.tokens[token1], network.tokens[tokenBase]]
+}
+
+const network = createNetwork(rnd, 20, 0.3)
 
 it('Token price calculation is correct', () => {
   const baseTokenIndex = 0
@@ -358,32 +349,30 @@ it('Token price calculation is correct', () => {
   })
 })
 
-it(`Multirouter output is correct for 20 tokens and ${network.pools.length} pools`, () => {
+it(`Multirouter output for ${network.tokens.length} tokens and ${network.pools.length} pools (200 times)`, () => {
   for (var i = 0; i < 200; ++i) {
-    const token0 = Math.floor(rnd() * 20)
-    const token1 = (token0 + 1 + Math.floor(rnd() * 19)) % 20
-    expect(token0).not.toEqual(token1)
-    const tokenBase = Math.floor(rnd() * 20)
+    const [t0, t1, tBase] = chooseRandomTokens(network)
     const amountIn = getRandom(rnd, 1e6, 1e24)
 
-    const route = findMultiRouting(
-      network.tokens[token0],
-      network.tokens[token1],
-      amountIn,
-      network.pools,
-      network.tokens[tokenBase],
-      network.gasPrice
-    )
-    checkRoute(
-      network,
-      network.tokens[token0],
-      network.tokens[token1],
-      amountIn,
-      network.tokens[tokenBase],
-      network.gasPrice,
-      route
-    )
+    const route = findMultiRouting(t0, t1, amountIn, network.pools, tBase, network.gasPrice)
+
+    checkRoute(network, t0, t1, amountIn, tBase, network.gasPrice, route)
 
     checkRouteResult('top20-' + i, route.totalAmountOut)
   }
 })
+
+function makeTestForTiming(tokens: number, density: number, tests: number) {
+  const network2 = createNetwork(rnd, tokens, density)
+  it(`Multirouter timing test for ${tokens} tokens and ${network2.pools.length} pools (${tests} times)`, () => {
+    for (var i = 0; i < tests; ++i) {
+      const [t0, t1, tBase] = chooseRandomTokens(network)
+      const amountIn = getRandom(rnd, 1e6, 1e24)
+
+      findMultiRouting(t0, t1, amountIn, network2.pools, tBase, network2.gasPrice)
+    }
+  })
+}
+
+makeTestForTiming(10, 0.5, 1000)
+makeTestForTiming(10, 0.9, 1000)
