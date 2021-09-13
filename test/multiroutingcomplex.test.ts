@@ -376,7 +376,7 @@ function exportNetwork(network: Network, from: RToken, to: RToken, route: MultiR
   fs.writeFileSync('D:/Info/Notes/GraphVisualization/data.js', nodes + edges + data)
 }
 
-function chooseRandomTokens(network: Network): [RToken, RToken, RToken] {
+function chooseRandomTokens(rnd: () => number, network: Network): [RToken, RToken, RToken] {
   const num = network.tokens.length
   const token0 = Math.floor(rnd() * num)
   const token1 = (token0 + 1 + Math.floor(rnd() * (num - 1))) % num
@@ -407,7 +407,7 @@ it('Token price calculation is correct', () => {
 
 it(`Multirouter for ${network.tokens.length} tokens and ${network.pools.length} pools (200 times)`, () => {
   for (var i = 0; i < 200; ++i) {
-    const [t0, t1, tBase] = chooseRandomTokens(network)
+    const [t0, t1, tBase] = chooseRandomTokens(rnd, network)
     const amountIn = getRandom(rnd, 1e6, 1e24)
 
     const route = findMultiRouting(t0, t1, amountIn, network.pools, tBase, network.gasPrice)
@@ -418,9 +418,9 @@ it(`Multirouter for ${network.tokens.length} tokens and ${network.pools.length} 
   }
 })
 
-it(`Multirouter-100 for ${network.tokens.length} tokens and ${network.pools.length} pools (200 times)`, () => {
+it(`Multirouter-100 for ${network.tokens.length} tokens and ${network.pools.length} pools`, () => {
   for (var i = 0; i < 10; ++i) {
-    const [t0, t1, tBase] = chooseRandomTokens(network)
+    const [t0, t1, tBase] = chooseRandomTokens(rnd, network)
     const amountIn = getRandom(rnd, 1e6, 1e24)
 
     const route = findMultiRouting(t0, t1, amountIn, network.pools, tBase, network.gasPrice, 100)
@@ -431,11 +431,29 @@ it(`Multirouter-100 for ${network.tokens.length} tokens and ${network.pools.leng
   }
 })
 
+it(`Multirouter path quantity check`, () => {
+  const rndInternal: () => number = seedrandom('00')
+  const steps = [1, 2, 4, 10, 20, 40, 100]
+  for (var i = 0; i < 5; ++i) {
+    const [t0, t1, tBase] = chooseRandomTokens(rndInternal, network)
+    const amountIn = getRandom(rndInternal, 1e6, 1e24)
+
+    let prevAmountOut = -1
+    steps.forEach(s => {
+      const route = findMultiRouting(t0, t1, amountIn, network.pools, tBase, network.gasPrice, s)
+      checkRoute(network, t0, t1, amountIn, tBase, network.gasPrice, route)
+      expect(route.totalAmountOut).toBeGreaterThan(prevAmountOut / 1.001)
+      prevAmountOut = route.totalAmountOut
+      checkRouteResult(`st-${i}-${s}`, route.totalAmountOut)
+    })
+  }
+})
+
 function makeTestForTiming(tokens: number, density: number, tests: number) {
   const network2 = createNetwork(rnd, tokens, density)
   it(`Multirouter timing test for ${tokens} tokens and ${network2.pools.length} pools (${tests} times)`, () => {
     for (var i = 0; i < tests; ++i) {
-      const [t0, t1, tBase] = chooseRandomTokens(network)
+      const [t0, t1, tBase] = chooseRandomTokens(rnd, network)
       const amountIn = getRandom(rnd, 1e6, 1e24)
 
       findMultiRouting(t0, t1, amountIn, network2.pools, tBase, network2.gasPrice)
