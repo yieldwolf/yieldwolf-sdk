@@ -1,7 +1,15 @@
 // @ts-ignore
 import seedrandom from 'seedrandom'
 import { findMultiRouting, Graph } from '../src/entities/MultiRouter'
-import { RConstantProductPool, Pool, RToken, MultiRoute, RouteStatus, RouteLeg } from '../src/types/MultiRouterTypes'
+import {
+  RConstantProductPool,
+  Pool,
+  RToken,
+  MultiRoute,
+  RouteStatus,
+  RouteLeg,
+  RHybridPool
+} from '../src/types/MultiRouterTypes'
 import { getBigNumber } from '../src/utils/MultiRouterMath'
 import { checkRouteResult } from './snapshots/snapshot'
 
@@ -11,12 +19,15 @@ const rnd: () => number = seedrandom(testSeed) // random [0, 1)
 const GAS_PRICE = 1 * 200 * 1e-9
 const MIN_TOKEN_PRICE = 1e-6
 const MAX_TOKEN_PRICE = 1e6
+const STABLE_TOKEN_PRICE = 1
 const MIN_POOL_RESERVE = 1e9
 const MAX_POOL_RESERVE = 1e31
 const MIN_POOL_IMBALANCE = 1 / (1 + 1e-3)
 const MAX_POOL_IMBALANCE = 1 + 1e-3
 const MIN_LIQUIDITY = 1000
 const MAX_LIQUIDITY = Math.pow(2, 110)
+const MIN_HYBRID_A = 200
+const MAX_HYBRID_A = 300000
 
 interface Variants {
   [key: string]: number
@@ -105,6 +116,50 @@ function getCPPool(rnd: () => number, t0: RToken, t1: RToken, price: number) {
   })
 }
 
+function getPoolA(rnd: () => number) {
+  return Math.floor(getRandom(rnd, MIN_HYBRID_A, MAX_HYBRID_A))
+}
+
+// price is always 1
+function getHybridPool(rnd: () => number, t0: RToken, t1: RToken) {
+  const fee = getPoolFee(rnd)
+  const imbalance = getPoolImbalance(rnd)
+  const A = getPoolA(rnd)
+
+  let reserve0 = getPoolReserve(rnd)
+  let reserve1 = reserve0 * STABLE_TOKEN_PRICE * imbalance
+  const maxReserve = Math.max(reserve0, reserve1)
+  if (maxReserve > MAX_LIQUIDITY) {
+    const reduceRate = (maxReserve / MAX_LIQUIDITY) * 1.00000001
+    reserve0 /= reduceRate
+    reserve1 /= reduceRate
+  }
+  const minReserve = Math.min(reserve0, reserve1)
+  if (minReserve < MIN_LIQUIDITY) {
+    const raseRate = (MIN_LIQUIDITY / minReserve) * 1.00000001
+    reserve0 *= raseRate
+    reserve1 *= raseRate
+  }
+  console.assert(reserve0 >= MIN_LIQUIDITY && reserve0 <= MAX_LIQUIDITY, 'Error reserve0 clculation')
+  console.assert(reserve1 >= MIN_LIQUIDITY && reserve1 <= MAX_LIQUIDITY, 'Error reserve1 clculation ' + reserve1)
+
+  return new RHybridPool({
+    token0: t0,
+    token1: t1,
+    address: `pool hb ${t0.name} ${t1.name} ${reserve0} ${1} ${fee}`,
+    reserve0: getBigNumber(undefined, reserve0),
+    reserve1: getBigNumber(undefined, reserve1),
+    fee,
+    A
+  })
+}
+
+function getRandomPool(rnd: () => number, t0: RToken, t1: RToken, price: number) {
+  if (price !== STABLE_TOKEN_PRICE) return getCPPool(rnd, t0, t1, price)
+  if (rnd() < 0.5) getCPPool(rnd, t0, t1, price)
+  return getHybridPool(rnd, t0, t1)
+}
+
 interface Network {
   tokens: RToken[]
   prices: number[]
@@ -117,31 +172,32 @@ function createNetwork(rnd: () => number, tokenNumber: number, density: number):
   const prices = []
   for (var i = 0; i < tokenNumber; ++i) {
     tokens.push({ name: '' + i, address: '' + i })
-    prices.push(getTokenPrice(rnd))
+    if (i <= tokenNumber * 0.3) prices.push(STABLE_TOKEN_PRICE)
+    else prices.push(getTokenPrice(rnd))
   }
 
-  const pools = []
+  const pools: Pool[] = []
   for (i = 0; i < tokenNumber; ++i) {
     for (var j = i + 1; j < tokenNumber; ++j) {
       const r = rnd()
       if (r < density) {
-        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+        pools.push(getRandomPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
       if (r < density * density) {
         // second pool
-        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+        pools.push(getRandomPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
       if (r < density * density * density) {
         // third pool
-        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+        pools.push(getRandomPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
       if (r < Math.pow(density, 4)) {
         // third pool
-        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+        pools.push(getRandomPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
       if (r < Math.pow(density, 5)) {
         // third pool
-        pools.push(getCPPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
+        pools.push(getRandomPool(rnd, tokens[i], tokens[j], prices[i] / prices[j]))
       }
     }
   }
