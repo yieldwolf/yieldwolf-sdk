@@ -1,18 +1,19 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Pool, RToken, RouteLeg, MultiRoute, RouteStatus } from '../types/MultiRouterTypes'
 import { ASSERT, calcInByOut, calcOutByIn, closeValues, calcPrice } from '../utils/MultiRouterMath'
-import TopologicalSort from '../utils/TopologicalSort'
 
-class Edge {
+export class Edge {
   readonly GasConsumption = 40_000
   readonly MINIMUM_LIQUIDITY = 1000
   pool: Pool
   vert0: Vertice
   vert1: Vertice
 
+  canBeUsed: boolean
   direction: boolean
   amountInPrevious: number // How many liquidity were passed from vert0 to vert1
   amountOutPrevious: number // How many liquidity were passed from vert0 to vert1
+  bestEdgeIncome: number // debug data
 
   constructor(p: Pool, v0: Vertice, v1: Vertice) {
     this.pool = p
@@ -20,7 +21,9 @@ class Edge {
     this.vert1 = v1
     this.amountInPrevious = 0
     this.amountOutPrevious = 0
+    this.canBeUsed = true
     this.direction = true
+    this.bestEdgeIncome = 0
   }
 
   reserve(v: Vertice): BigNumber {
@@ -84,6 +87,7 @@ class Edge {
     }
   }
 
+  // doesn't used in production - just for testing
   testApply(from: Vertice, amountIn: number, amountOut: number) {
     console.assert(this.amountInPrevious * this.amountOutPrevious >= 0)
     const inPrev = this.direction ? this.amountInPrevious : -this.amountInPrevious
@@ -155,7 +159,7 @@ class Edge {
   }
 }
 
-class Vertice {
+export class Vertice {
   token: RToken
   edges: Edge[]
 
@@ -166,6 +170,7 @@ class Vertice {
   gasSpent: number // temp data used for findBestPath algorithm
   bestTotal: number // temp data used for findBestPath algorithm
   bestSource?: Edge // temp data used for findBestPath algorithm
+  checkLine: number // debug data
 
   constructor(t: RToken) {
     this.token = t
@@ -176,6 +181,7 @@ class Vertice {
     this.gasSpent = 0
     this.bestTotal = 0
     this.bestSource = undefined
+    this.checkLine = -1
   }
 
   getNeibour(e?: Edge) {
@@ -217,7 +223,7 @@ export class Graph {
     edges.forEach(([e, _]) => {
       const v = e.vert0 === from ? e.vert1 : e.vert0
       if (v.price !== 0) return
-      let p = calcPrice(e.pool, 0)
+      let p = calcPrice(e.pool, 0, false)
       if (from === e.vert0) p = 1 / p
       this.setPrices(v, price * p, gasPrice / p)
     })
@@ -230,6 +236,77 @@ export class Graph {
     this.vertices.push(vert)
     this.tokens.set(token, vert)
     return vert
+  }
+
+  exportPath(from: RToken, to: RToken) {
+    //}, _route: MultiRoute) {
+    // const allPools = new Map<string, Pool>();
+    // this.edges.forEach(p => allPools.set(p.address, p));
+    // const usedPools = new Map<string, boolean>();
+    // route.legs.forEach(l => usedPools.set(l.address, l.token === allPools.get(l.address)?.token0))
+
+    const fromVert = this.tokens.get(from) as Vertice
+    const toVert = this.tokens.get(to) as Vertice
+    const initValue = (fromVert.bestIncome * fromVert.price) / toVert.price
+
+    const route = new Set<Edge>()
+    for (let v = toVert; v !== fromVert; v = v.getNeibour(v.bestSource) as Vertice) {
+      if (v.bestSource) route.add(v.bestSource)
+    }
+
+    function edgeStyle(e: Edge) {
+      const finish = e.vert1.bestSource === e
+      const start = e.vert0.bestSource === e
+      let label
+      if (e.bestEdgeIncome === -1) label = 'label: "low_liq"'
+      if (e.bestEdgeIncome !== 0) label = `label: "${print((e.bestEdgeIncome / initValue - 1) * 100, 3)}%"`
+      const edgeValue = route.has(e) ? 'value: 2' : undefined
+      let arrow
+      if (finish && start) arrow = 'arrows: "from,to"'
+      if (finish) arrow = 'arrows: "to"'
+      if (start) arrow = 'arrows: "from"'
+      return ['', label, edgeValue, arrow].filter(a => a !== undefined).join(', ')
+    }
+
+    function print(n: number, digits: number) {
+      let out
+      if (n === 0) out = '0'
+      else {
+        const n0 = n > 0 ? n : -n
+        const shift = digits - Math.ceil(Math.log(n0) / Math.LN10)
+        if (shift <= 0) out = `${Math.round(n0)}`
+        else {
+          const mult = Math.pow(10, shift)
+          out = `${Math.round(n0 * mult) / mult}`
+        }
+        if (n < 0) out = -out
+      }
+      return out
+    }
+
+    function nodeLabel(v: Vertice) {
+      const value = (v.bestIncome * v.price) / toVert.price
+      const income = `${print(value, 3)}`
+      const total = `${print(v.bestTotal, 3)}`
+      // const income = `${print((value/initValue-1)*100, 3)}%`
+      // const total = `${print((v.bestTotal/initValue-1)*100, 3)}%`
+      const checkLine = v.checkLine === -1 ? undefined : `${v.checkLine}`
+      return [checkLine, income, total].filter(a => a !== undefined).join(':')
+    }
+
+    const nodes = `var nodes = new vis.DataSet([
+      ${this.vertices.map(t => `{ id: ${t.token.name}, label: "${nodeLabel(t)}"}`).join(',\n\t\t')}
+    ]);\n`
+    const edges = `var edges = new vis.DataSet([
+      ${this.edges.map(p => `{ from: ${p.vert0.token.name}, to: ${p.vert1.token.name}${edgeStyle(p)}}`).join(',\n\t\t')}
+    ]);\n`
+    const data = `var data = {
+        nodes: nodes,
+        edges: edges,
+    };\n`
+
+    const fs = require('fs')
+    fs.writeFileSync('D:/Info/Notes/GraphVisualization/data.js', nodes + edges + data)
   }
 
   findBestPath(
@@ -248,17 +325,20 @@ export class Graph {
     const finish = this.tokens.get(to)
     if (!start || !finish) return
 
+    this.edges.forEach(e => (e.bestEdgeIncome = 0))
     this.vertices.forEach(v => {
       v.bestIncome = 0
       v.gasSpent = 0
       v.bestTotal = 0
       v.bestSource = undefined
+      v.checkLine = -1
     })
     start.bestIncome = amountIn
     start.bestTotal = amountIn
     const processedVert = new Set<Vertice>()
     const nextVertList = [start] // TODO: Use sorted Set!
 
+    let checkLine = 0
     for (;;) {
       let closestVert: Vertice | undefined
       let closestTotal = -1
@@ -272,6 +352,9 @@ export class Graph {
       })
 
       if (!closestVert) return
+
+      closestVert.checkLine = checkLine++
+
       if (closestVert === finish) {
         const bestPath = []
         for (let v: Vertice | undefined = finish; v?.bestSource; v = v.getNeibour(v.bestSource)) {
@@ -296,10 +379,16 @@ export class Graph {
           // Any arithmetic error or out-of-liquidity
           return
         }
-        if (e.checkMinimalLiquidityExceededAfterSwap(closestVert as Vertice, newIncome)) return
+        if (e.checkMinimalLiquidityExceededAfterSwap(closestVert as Vertice, newIncome)) {
+          e.bestEdgeIncome = -1
+          return
+        }
         const newGasSpent = (closestVert as Vertice).gasSpent + gas
         const price = v2.price / finish.price
         const newTotal = newIncome * price - newGasSpent * finish.gasPrice
+
+        console.assert(e.bestEdgeIncome === 0, 'Error 373')
+        e.bestEdgeIncome = newIncome * price
 
         if (!v2.bestSource) nextVertList.push(v2)
         if (!v2.bestSource || newTotal > v2.bestTotal) {
@@ -369,8 +458,8 @@ export class Graph {
       e.direction = true
     })
     let output = 0
-    let gasSpent = 0
-    let totalOutput = 0
+    let gasSpentInit = 0
+    //let totalOutput = 0
     let totalrouted = 0
     let step
     for (step = 0; step < routeValues.length; ++step) {
@@ -379,37 +468,53 @@ export class Graph {
         break
       } else {
         output += p.output
-        gasSpent += p.gasSpent
-        totalOutput += p.totalOutput
+        gasSpentInit += p.gasSpent
+        //totalOutput += p.totalOutput
         this.addPath(this.tokens.get(from), this.tokens.get(to), p.path)
         totalrouted += routeValues[step]
       }
     }
+    if (step == 0)
+      return {
+        status: RouteStatus.NoWay,
+        amountIn: 0,
+        amountOut: 0,
+        legs: [],
+        gasSpent: 0,
+        totalAmountOut: 0
+      }
     let status
-    if (step === 0) status = RouteStatus.NoWay
-    else if (step < routeValues.length) status = RouteStatus.Partial
+    if (step < routeValues.length) status = RouteStatus.Partial
     else status = RouteStatus.Success
+
+    const fromVert = this.tokens.get(from) as Vertice
+    const toVert = this.tokens.get(to) as Vertice
+    const [legs, gasSpent, topologyWasChanged] = this.getRouteLegs(fromVert, toVert)
+    console.assert(gasSpent <= gasSpentInit, 'Internal Error 491')
+
+    if (topologyWasChanged) {
+      output = this.calcLegsAmountOut(legs, amountIn, to)
+    }
 
     return {
       status,
       amountIn: amountIn * totalrouted,
       amountOut: output,
-      legs: this.getRouteLegs(),
-      gasSpent: gasSpent,
-      totalAmountOut: totalOutput
+      legs,
+      gasSpent,
+      totalAmountOut: output - gasSpent * toVert.gasPrice
     }
   }
 
-  getRouteLegs(): RouteLeg[] {
-    const nodes = this.topologySort()
+  getRouteLegs(from: Vertice, to: Vertice): [RouteLeg[], number, boolean] {
+    const [nodes, topologyWasChanged] = this.cleanTopology(from, to)
     const legs: RouteLeg[] = []
+    let gasSpent = 0
     nodes.forEach(n => {
-      const outEdges = n.edges
-        .map(e => {
-          const from = this.edgeFrom(e)
-          return from ? [e, from[0], from[1]] : [e]
-        })
-        .filter(e => e[1] === n)
+      const outEdges = this.getOutputEdges(n).map(e => {
+        const from = this.edgeFrom(e)
+        return from ? [e, from[0], from[1]] : [e]
+      })
 
       let outAmount = outEdges.reduce((a, b) => a + (b[2] as number), 0)
       if (outAmount <= 0) return
@@ -424,11 +529,12 @@ export class Graph {
           swapPortion: quantity,
           absolutePortion: p / total
         })
+        gasSpent += (e[0] as Edge).pool.swapGasCost
         outAmount -= p
       })
       console.assert(outAmount / total < 1e-12, 'Error 281')
     })
-    return legs
+    return [legs, gasSpent, topologyWasChanged]
   }
 
   edgeFrom(e: Edge): [Vertice, number] | undefined {
@@ -438,24 +544,168 @@ export class Graph {
 
   getOutputEdges(v: Vertice): Edge[] {
     return v.edges.filter(e => {
-      const from = this.edgeFrom(e)
-      if (from === undefined) return false
-      return from[0] === v
+      if (!e.canBeUsed) return false
+      if (e.amountInPrevious === 0) return false
+      if (e.direction !== (e.vert0 === v)) return false
+      return true
     })
   }
 
-  topologySort(): Vertice[] {
-    const nodes = new Map<string, Vertice>()
-    this.vertices.forEach(v => nodes.set(v.token.name, v))
-    const sortOp = new TopologicalSort(nodes)
-    this.edges.forEach(e => {
-      if (e.amountInPrevious === 0) return
-      if (e.direction) sortOp.addEdge(e.vert0.token.name, e.vert1.token.name)
-      else sortOp.addEdge(e.vert1.token.name, e.vert0.token.name)
+  getInputEdges(v: Vertice): Edge[] {
+    return v.edges.filter(e => {
+      if (!e.canBeUsed) return false
+      if (e.amountInPrevious === 0) return false
+      if (e.direction === (e.vert0 === v)) return false
+      return true
     })
-    const sorted = Array.from(sortOp.sort().keys()).map(k => nodes.get(k)) as Vertice[]
+  }
 
-    return sorted
+  calcLegsAmountOut(legs: RouteLeg[], amountIn: number, to: RToken) {
+    const amounts = new Map<RToken, number>()
+    amounts.set(legs[0].token, amountIn)
+    legs.forEach(l => {
+      const vert = this.tokens.get(l.token)
+      console.assert(vert !== undefined, 'Internal Error 570')
+      const edge = (vert as Vertice).edges.find(e => e.pool.address === l.address)
+      console.assert(edge !== undefined, 'Internel Error 569')
+      const pool = (edge as Edge).pool
+      const direction = vert === (edge as Edge).vert0
+
+      const inputTotal = amounts.get(l.token)
+      console.assert(inputTotal !== undefined, 'Internal Error 564')
+      const input = (inputTotal as number) * l.swapPortion
+      amounts.set(l.token, (inputTotal as number) - input)
+      const output = calcOutByIn(pool, input, direction)
+
+      const vertNext = (vert as Vertice).getNeibour(edge) as Vertice
+      const prevAmount = amounts.get(vertNext.token)
+      amounts.set(vertNext.token, (prevAmount || 0) + output)
+    })
+    return amounts.get(to) || 0
+  }
+
+  // removes all cycles if there are any, then removes all dead end could appear after cycle removing
+  // Returns clean result topologically sorted
+  cleanTopology(from: Vertice, to: Vertice): [Vertice[], boolean] {
+    let topologyWasChanged = false
+    let result = this.topologySort(from, to)
+    if (result[0] !== 2) {
+      topologyWasChanged = true
+      console.assert(result[0] === 0, 'Internal Error 554')
+      while (result[0] === 0) {
+        this.removeWeakestEdge(result[1])
+        result = this.topologySort(from, to)
+      }
+      if (result[0] === 3) {
+        this.removeDeadEnds(result[1])
+        result = this.topologySort(from, to)
+      }
+      console.assert(result[0] === 2, 'Internal Error 563')
+      if (result[0] !== 2) return [[], topologyWasChanged]
+    }
+    return [result[1], topologyWasChanged]
+  }
+
+  removeDeadEnds(verts: Vertice[]) {
+    verts.forEach(v => {
+      this.getInputEdges(v).forEach(e => {
+        e.canBeUsed = false
+      })
+    })
+  }
+
+  removeWeakestEdge(verts: Vertice[]) {
+    let minVert: Vertice, minVertNext: Vertice
+    let minOutput = Number.MAX_VALUE
+    verts.forEach((v1, i) => {
+      const v2 = i === 0 ? verts[verts.length - 1] : verts[i - 1]
+      let out = 0
+      this.getOutputEdges(v1).forEach(e => {
+        if (v1.getNeibour(e) !== v2) return
+        out += e.direction ? e.amountOutPrevious : e.amountInPrevious
+      })
+      if (out < minOutput) {
+        minVert = v1
+        minVertNext = v2
+        minOutput = out
+      }
+    })
+    // @ts-ignore
+    this.getOutputEdges(minVert).forEach(e => {
+      if (minVert.getNeibour(e) !== minVertNext) return
+      e.canBeUsed = false
+    })
+  }
+
+  // topological sort
+  // if there is a cycle - returns [0, <List of envolved vertices in the cycle>]
+  // if there are no cycles but deadends- returns [3, <List of all envolved deadend vertices>]
+  // if there are no cycles or deadends- returns [2, <List of all envolved vertices topologically sorted>]
+  topologySort(from: Vertice, to: Vertice): [number, Vertice[]] {
+    // undefined or 0 - not processed, 1 - in process, 2 - finished, 3 - dedend
+    const vertState = new Map<Vertice, number>()
+    const vertsFinished: Vertice[] = []
+    const foundCycle: Vertice[] = []
+    const foundDeadEndVerts: Vertice[] = []
+
+    const that = this
+    // 0 - cycle was found and created, return
+    // 1 - during cycle creating
+    // 2 - vertex is processed ok
+    // 3 - dead end vertex
+    function topSortRecursive(current: Vertice): number {
+      const state = vertState.get(current)
+      if (state === 2 || state === 3) return state
+      if (state === 1) {
+        console.assert(foundCycle.length == 0, 'Internal Error 566')
+        foundCycle.push(current)
+        return 1
+      }
+      vertState.set(current, 1)
+
+      let successors2Exist = false
+      const outEdges = that.getOutputEdges(current)
+      for (let i = 0; i < outEdges.length; ++i) {
+        const e = outEdges[i]
+        const res = topSortRecursive(current.getNeibour(e) as Vertice)
+        if (res === 0) return 0
+        if (res === 1) {
+          if (foundCycle[0] === current) return 0
+          else {
+            foundCycle.push(current)
+            return 1
+          }
+        }
+        if (res === 2) successors2Exist = true // Ok successors
+      }
+      if (successors2Exist) {
+        console.assert(current !== to, 'Internal Error 589')
+        vertsFinished.push(current)
+        vertState.set(current, 2)
+        return 2
+      } else {
+        if (current !== to) {
+          foundDeadEndVerts.push(current)
+          vertState.set(current, 3)
+          return 3
+        }
+        vertsFinished.push(current)
+        vertState.set(current, 2)
+        return 2
+      }
+    }
+
+    const res = topSortRecursive(from)
+    if (res === 0) return [0, foundCycle]
+    if (foundDeadEndVerts.length) return [3, foundDeadEndVerts]
+    ASSERT(() => {
+      if (vertsFinished[0] !== to) return false
+      if (vertsFinished[vertsFinished.length - 1] !== from) return false
+      return true
+    }, 'Internal Error 614')
+    if (res === 2) return [2, vertsFinished.reverse()]
+    console.assert(true, 'Internal Error 612')
+    return [1, []]
   }
 }
 
