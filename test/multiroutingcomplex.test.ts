@@ -268,7 +268,7 @@ function checkRoute(
   const basePricesAreSet = connectedTokens.has(baseToken)
 
   // amountIn checks
-  if (route.status === RouteStatus.Success) expect(route.amountIn).toEqual(amountIn)
+  if (route.status === RouteStatus.Success) expectToBeClose(route.amountIn, amountIn, 1e-13)
   else if (route.status === RouteStatus.Partial) {
     expect(route.amountIn).toBeLessThan(amountIn)
     expect(route.amountIn).toBeGreaterThan(0)
@@ -405,7 +405,7 @@ it('Token price calculation is correct', () => {
   })
 })
 
-it(`Multirouter output for ${network.tokens.length} tokens and ${network.pools.length} pools (200 times)`, () => {
+it(`Multirouter for ${network.tokens.length} tokens and ${network.pools.length} pools (200 times)`, () => {
   for (var i = 0; i < 200; ++i) {
     const [t0, t1, tBase] = chooseRandomTokens(network)
     const amountIn = getRandom(rnd, 1e6, 1e24)
@@ -415,6 +415,19 @@ it(`Multirouter output for ${network.tokens.length} tokens and ${network.pools.l
     checkRoute(network, t0, t1, amountIn, tBase, network.gasPrice, route)
 
     checkRouteResult('top20-' + i, route.totalAmountOut)
+  }
+})
+
+it(`Multirouter-100 for ${network.tokens.length} tokens and ${network.pools.length} pools (200 times)`, () => {
+  for (var i = 0; i < 10; ++i) {
+    const [t0, t1, tBase] = chooseRandomTokens(network)
+    const amountIn = getRandom(rnd, 1e6, 1e24)
+
+    const route = findMultiRouting(t0, t1, amountIn, network.pools, tBase, network.gasPrice, 100)
+
+    checkRoute(network, t0, t1, amountIn, tBase, network.gasPrice, route)
+
+    checkRouteResult('m100-' + i, route.totalAmountOut)
   }
 })
 
