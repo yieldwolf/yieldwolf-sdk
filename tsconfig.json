@@ -1,5 +1,6 @@
 {
   "include": ["src"],
+  "exclude": ["src/entities/MultiRouter.ts"],
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
