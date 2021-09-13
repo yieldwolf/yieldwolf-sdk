@@ -122,5 +122,6 @@ export const WNATIVE: TokenMap = {
     18,
     'WMOVR',
     'Wrapped Moonriver'
-  )
+  ),
+  [ChainId.FUSE]: new Token(ChainId.FUSE, WNATIVE_ADDRESS[ChainId.FUSE], 18, 'WFUSE', 'Wrapped Fuse')
 }
