@@ -1,7 +1,7 @@
 import { BENTOBOX_ADDRESS, STOP_LIMIT_ORDER_ADDRESS } from '../constants'
 import { bentoTypes, name, types } from '../types'
 
-import { ChainId } from 'enums'
+import { ChainId } from '../enums'
 import { SigningKey } from '@ethersproject/signing-key'
 import { Web3Provider } from '@ethersproject/providers'
 import { getMessage } from 'eip-712'

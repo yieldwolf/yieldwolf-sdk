@@ -4,6 +4,7 @@ import {
   Celo,
   Ether,
   Fantom,
+  Fuse,
   Harmony,
   Heco,
   Matic,
@@ -40,5 +41,6 @@ export const NATIVE = {
   [ChainId.OKEX_TESTNET]: Okex.onChain(ChainId.OKEX_TESTNET),
   [ChainId.CELO]: Celo.onChain(ChainId.CELO),
   [ChainId.PALM]: Palm.onChain(ChainId.PALM),
-  [ChainId.MOONRIVER]: Movr.onChain(ChainId.MOONRIVER)
+  [ChainId.MOONRIVER]: Movr.onChain(ChainId.MOONRIVER),
+  [ChainId.FUSE]: Fuse.onChain(ChainId.FUSE)
 }
