@@ -39,7 +39,8 @@
     "jsbi": "^3.1.0",
     "tiny-invariant": "^1.1.0",
     "tiny-warning": "^1.0.3",
-    "toformat": "^2.0.0"
+    "toformat": "^2.0.0",
+    "@sushiswap/trident": "git+ssh://git@github.com/sushiswap/trident-dev-deployments.git"
   },
   "peerDependencies": {
     "@ethersproject/abi": "^5.4.0",
