@@ -1,7 +1,6 @@
-import { FACTORY_ADDRESS, FIVE, MINIMUM_LIQUIDITY, ONE, ZERO, _1000, _997 } from '../constants'
+import { FACTORY_ADDRESS, MINIMUM_LIQUIDITY, ONE, ZERO, _1000, _997 } from '../constants'
 import { InsufficientInputAmountError, InsufficientReservesError } from '../errors'
 
-import { BigintIsh } from '../types'
 import { CurrencyAmount } from './CurrencyAmount'
 import { Fee } from '../enums'
 import JSBI from 'jsbi'
@@ -14,6 +13,7 @@ import { sqrt } from '../functions/sqrt'
 export class ConstantProductPool {
   public readonly liquidityToken: Token
   public readonly fee: Fee
+  public readonly twap: boolean
   private readonly tokenAmounts: [CurrencyAmount<Token>, CurrencyAmount<Token>]
 
   public static getAddress(tokenA: Token, tokenB: Token, fee: Fee = 25, twap: boolean = true): string {
@@ -43,6 +43,7 @@ export class ConstantProductPool {
       'Sushi LP Token'
     )
     this.fee = fee
+    this.twap = twap
     this.tokenAmounts = currencyAmounts as [CurrencyAmount<Token>, CurrencyAmount<Token>]
   }
 
@@ -148,7 +149,10 @@ export class ConstantProductPool {
       outputAmount.currency.equals(this.token0) ? this.token1 : this.token0,
       JSBI.add(JSBI.divide(numerator, denominator), ONE)
     )
-    return [inputAmount, new ConstantProductPool(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))]
+    return [
+      inputAmount,
+      new ConstantProductPool(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount), this.fee, this.twap)
+    ]
   }
 
   public getLiquidityMinted(
@@ -182,40 +186,15 @@ export class ConstantProductPool {
   public getLiquidityValue(
     token: Token,
     totalSupply: CurrencyAmount<Token>,
-    liquidity: CurrencyAmount<Token>,
-    feeOn: boolean = false,
-    kLast?: BigintIsh
+    liquidity: CurrencyAmount<Token>
   ): CurrencyAmount<Token> {
     invariant(this.involvesToken(token), 'TOKEN')
     invariant(totalSupply.currency.equals(this.liquidityToken), 'TOTAL_SUPPLY')
     invariant(liquidity.currency.equals(this.liquidityToken), 'LIQUIDITY')
     invariant(JSBI.lessThanOrEqual(liquidity.quotient, totalSupply.quotient), 'LIQUIDITY')
-
-    let totalSupplyAdjusted: CurrencyAmount<Token>
-    if (!feeOn) {
-      totalSupplyAdjusted = totalSupply
-    } else {
-      invariant(!!kLast, 'K_LAST')
-      const kLastParsed = JSBI.BigInt(kLast)
-      if (!JSBI.equal(kLastParsed, ZERO)) {
-        const rootK = sqrt(JSBI.multiply(this.reserve0.quotient, this.reserve1.quotient))
-        const rootKLast = sqrt(kLastParsed)
-        if (JSBI.greaterThan(rootK, rootKLast)) {
-          const numerator = JSBI.multiply(totalSupply.quotient, JSBI.subtract(rootK, rootKLast))
-          const denominator = JSBI.add(JSBI.multiply(rootK, FIVE), rootKLast)
-          const feeLiquidity = JSBI.divide(numerator, denominator)
-          totalSupplyAdjusted = totalSupply.add(CurrencyAmount.fromRawAmount(this.liquidityToken, feeLiquidity))
-        } else {
-          totalSupplyAdjusted = totalSupply
-        }
-      } else {
-        totalSupplyAdjusted = totalSupply
-      }
-    }
-
     return CurrencyAmount.fromRawAmount(
       token,
-      JSBI.divide(JSBI.multiply(liquidity.quotient, this.reserveOf(token).quotient), totalSupplyAdjusted.quotient)
+      JSBI.divide(JSBI.multiply(liquidity.quotient, this.reserveOf(token).quotient), totalSupply.quotient)
     )
   }
 }
