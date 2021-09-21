@@ -238,7 +238,8 @@ export class Graph {
     return vert
   }
 
-  exportPath(from: RToken, to: RToken) {
+  // Function just for testing - but very usefull !!!
+  /*exportPath(from: RToken, to: RToken) {
     //}, _route: MultiRoute) {
     // const allPools = new Map<string, Pool>();
     // this.edges.forEach(p => allPools.set(p.address, p));
@@ -307,7 +308,7 @@ export class Graph {
 
     const fs = require('fs')
     fs.writeFileSync('D:/Info/Notes/GraphVisualization/data.js', nodes + edges + data)
-  }
+  }*/
 
   findBestPath(
     from: RToken,
