@@ -1,7 +1,7 @@
 {
   "name": "@sushiswap/sdk",
   "license": "MIT",
-  "version": "5.0.0-canary.86",
+  "version": "5.0.0-canary.87",
   "description": "🛠 An SDK for building applications on top of SushiSwap.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -33,7 +33,6 @@
     "*.md": "prettier --write"
   },
   "dependencies": {
-    "@sushiswap/trident": "git+ssh://git@github.com/sushiswap/trident-dev-deployments.git",
     "big.js": "^6.1.0",
     "decimal.js-light": "^2.5.0",
     "isomorphic-unfetch": "^3.1.0",
