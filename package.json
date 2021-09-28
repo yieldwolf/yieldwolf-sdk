@@ -1,7 +1,7 @@
 {
   "name": "@sushiswap/sdk",
   "license": "MIT",
-  "version": "5.0.0-canary.90",
+  "version": "5.0.0-canary.91",
   "description": "🛠 An SDK for building applications on top of SushiSwap.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "build": "tsdx build",
     "watch": "tsdx watch",
     "test": "tsdx test",
-    "prepublishOnly": "tsdx build",
+    "prepublish": "tsdx build",
     "prepare": "husky install",
     "prettier": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
   },
