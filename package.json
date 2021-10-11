@@ -1,7 +1,7 @@
 {
   "name": "@sushiswap/sdk",
   "license": "MIT",
-  "version": "5.0.0-canary.94",
+  "version": "5.0.0-canary.95",
   "description": "🛠 An SDK for building applications on top of SushiSwap.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -33,30 +33,6 @@
     "*.md": "prettier --write"
   },
   "dependencies": {
-    "big.js": "^6.1.0",
-    "decimal.js-light": "^2.5.0",
-    "eip-712": "^0.4.3",
-    "isomorphic-unfetch": "^3.1.0",
-    "jsbi": "^3.1.0",
-    "tiny-invariant": "^1.1.0",
-    "tiny-warning": "^1.0.3",
-    "toformat": "^2.0.0"
-  },
-  "peerDependencies": {
-    "@ethersproject/abi": "^5.4.0",
-    "@ethersproject/abstract-signer": "^5.4.0",
-    "@ethersproject/address": "^5.4.0",
-    "@ethersproject/bignumber": "^5.4.0",
-    "@ethersproject/bytes": "^5.4.0",
-    "@ethersproject/contracts": "^5.4.0",
-    "@ethersproject/experimental": "^5.4.0",
-    "@ethersproject/networks": "^5.4.0",
-    "@ethersproject/providers": "^5.4.0",
-    "@ethersproject/signing-key": "^5.4.0",
-    "@ethersproject/solidity": "^5.4.0",
-    "@ethersproject/transactions": "^5.4.0"
-  },
-  "devDependencies": {
     "@ethersproject/abi": "^5.4.0",
     "@ethersproject/abstract-signer": "^5.4.0",
     "@ethersproject/address": "^5.4.0",
@@ -70,6 +46,16 @@
     "@ethersproject/solidity": "^5.4.0",
     "@ethersproject/transactions": "^5.4.0",
     "@sushiswap/core": "^2.0.0-canary.1",
+    "big.js": "^6.1.0",
+    "decimal.js-light": "^2.5.0",
+    "eip-712": "^0.4.3",
+    "isomorphic-unfetch": "^3.1.0",
+    "jsbi": "^3.1.0",
+    "tiny-invariant": "^1.1.0",
+    "tiny-warning": "^1.0.3",
+    "toformat": "^2.0.0"
+  },
+  "devDependencies": {
     "@sushiswap/prettier-config": "^0.1.0",
     "@types/big.js": "^6.1.0",
     "babel-plugin-transform-jsbi-to-bigint": "^1.4.0",
