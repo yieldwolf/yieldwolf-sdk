@@ -1,8 +1,8 @@
-import { Cronos } from 'entities/Native/Cronos'
 import {
   Avalanche,
   Binance,
   Celo,
+  Cronos,
   Ether,
   Fantom,
   Fuse,
