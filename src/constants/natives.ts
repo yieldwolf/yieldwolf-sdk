@@ -1,3 +1,4 @@
+import { Cronos } from 'entities/Native/Cronos'
 import {
   Avalanche,
   Binance,
@@ -11,9 +12,8 @@ import {
   Movr,
   Okex,
   Palm,
-  xDai
+  xDai,
 } from '../entities/Native'
-
 import { ChainId } from '../enums'
 
 export const NATIVE = {
@@ -42,5 +42,6 @@ export const NATIVE = {
   [ChainId.CELO]: Celo.onChain(ChainId.CELO),
   [ChainId.PALM]: Palm.onChain(ChainId.PALM),
   [ChainId.MOONRIVER]: Movr.onChain(ChainId.MOONRIVER),
-  [ChainId.FUSE]: Fuse.onChain(ChainId.FUSE)
+  [ChainId.FUSE]: Fuse.onChain(ChainId.FUSE),
+  [ChainId.CRONOS]: Cronos.onChain(ChainId.CRONOS),
 }

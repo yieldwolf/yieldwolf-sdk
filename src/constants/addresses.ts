@@ -1,5 +1,5 @@
-import { AddressMap } from '../types'
 import { ChainId } from '../enums'
+import { AddressMap } from '../types'
 
 export const USDC_ADDRESS: AddressMap = {
   [ChainId.MAINNET]: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
@@ -15,6 +15,7 @@ export const USDC_ADDRESS: AddressMap = {
   [ChainId.ARBITRUM]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
   [ChainId.AVALANCHE]: '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664',
   [ChainId.MOONRIVER]: '0xE3F5a90F9cb311505cd691a46596599aA1A0AD7D',
+  [ChainId.CRONOS]: '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59',
 }
 
 export const USD_ADDRESS: AddressMap = {
@@ -32,6 +33,7 @@ export const USD_ADDRESS: AddressMap = {
   [ChainId.AVALANCHE]: USDC_ADDRESS[ChainId.AVALANCHE],
   [ChainId.MOONRIVER]: USDC_ADDRESS[ChainId.MOONRIVER],
   [ChainId.CELO]: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+  [ChainId.CRONOS]: USDC_ADDRESS[ChainId.CRONOS],
 }
 
 export const FACTORY_ADDRESS: AddressMap = {
@@ -63,6 +65,7 @@ export const FACTORY_ADDRESS: AddressMap = {
   [ChainId.PALM_TESTNET]: '',
   [ChainId.MOONRIVER]: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
   [ChainId.FUSE]: '0x43eA90e2b786728520e4f930d2A71a477BF2737C',
+  [ChainId.CRONOS]: '0x73A48f8f521EB31c55c0e1274dB0898dE599Cb11', // CronaSwap
 }
 
 export const ROUTER_ADDRESS: AddressMap = {
@@ -94,6 +97,7 @@ export const ROUTER_ADDRESS: AddressMap = {
   [ChainId.PALM_TESTNET]: '',
   [ChainId.MOONRIVER]: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
   [ChainId.FUSE]: '0xF4d73326C13a4Fc5FD7A064217e12780e9Bd62c3',
+  [ChainId.CRONOS]: '0xcd7d16fB918511BF7269eC4f48d61D79Fb26f918', // CronaSwap
 }
 
 export const SUSHI_ADDRESS: AddressMap = {
@@ -116,6 +120,7 @@ export const SUSHI_ADDRESS: AddressMap = {
   [ChainId.PALM]: '',
   [ChainId.PALM_TESTNET]: '',
   [ChainId.MOONRIVER]: '0xf390830DF829cf22c53c8840554B98eafC5dCBc2',
+  [ChainId.CRONOS]: '',
 }
 
 export const MASTERCHEF_ADDRESS: AddressMap = {
@@ -267,6 +272,7 @@ export const WETH9_ADDRESS: AddressMap = {
   [ChainId.HARMONY]: '0x6983D1E6DEf3690C4d616b13597A09e6193EA013',
   [ChainId.XDAI]: '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
   [ChainId.AVALANCHE]: '0xf20d962a6c8f70c731bd838a3a388D7d48fA6e15',
+  [ChainId.CRONOS]: '0xe44Fd7fCb2b1581822D0c862B68222998a0c299a',
 }
 
 export const WNATIVE_ADDRESS: AddressMap = {
@@ -297,6 +303,7 @@ export const WNATIVE_ADDRESS: AddressMap = {
   [ChainId.PALM]: '0xF98cABF0a963452C5536330408B2590567611a71',
   [ChainId.MOONRIVER]: '0xf50225a84382c74CbdeA10b0c176f71fc3DE0C4d',
   [ChainId.FUSE]: '0x0BE9e53fd7EDaC9F859882AfdDa116645287C629',
+  [ChainId.CRONOS]: '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23',
 }
 
 export const MASTERCHEF_V2_ADDRESS: AddressMap = {
@@ -341,4 +348,5 @@ export const MULTICALL2_ADDRESS: AddressMap = {
   [ChainId.PALM]: '0x0769fd68dFb93167989C6f7254cd0D766Fb2841F',
   [ChainId.MOONRIVER]: '0x270f2F35bED92B7A59eA5F08F6B3fd34c8D9D9b5',
   [ChainId.FUSE]: '0x0769fd68dFb93167989C6f7254cd0D766Fb2841F',
+  [ChainId.CRONOS]: '0xE41382636a5482EFbBFE575b924527f75C102400',
 }

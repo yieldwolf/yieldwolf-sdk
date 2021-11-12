@@ -1,8 +1,7 @@
-import { USDC_ADDRESS, USD_ADDRESS, WETH9_ADDRESS, WNATIVE_ADDRESS } from './addresses'
-
-import { ChainId } from '../enums'
 import { Token } from '../entities/Token'
+import { ChainId } from '../enums'
 import { TokenMap } from '../types/TokenMap'
+import { USDC_ADDRESS, USD_ADDRESS, WETH9_ADDRESS, WNATIVE_ADDRESS } from './addresses'
 
 export const USDC: TokenMap = {
   [ChainId.MAINNET]: new Token(ChainId.MAINNET, USDC_ADDRESS[ChainId.MAINNET], 6, 'USDC', 'USD Coin'),
@@ -17,6 +16,7 @@ export const USDC: TokenMap = {
   [ChainId.XDAI]: new Token(ChainId.XDAI, USDC_ADDRESS[ChainId.XDAI], 6, 'USDC', 'USD Coin'),
   [ChainId.ARBITRUM]: new Token(ChainId.ARBITRUM, USDC_ADDRESS[ChainId.ARBITRUM], 6, 'USDC', 'USD Coin'),
   [ChainId.MOONRIVER]: new Token(ChainId.MOONRIVER, USDC_ADDRESS[ChainId.MOONRIVER], 6, 'USDC', 'USD Coin'),
+  [ChainId.CRONOS]: new Token(ChainId.CRONOS, USDC_ADDRESS[ChainId.CRONOS], 6, 'USDC', 'USD Coin'),
 }
 
 export const USD: TokenMap = {
@@ -130,4 +130,5 @@ export const WNATIVE: TokenMap = {
     'Wrapped Moonriver'
   ),
   [ChainId.FUSE]: new Token(ChainId.FUSE, WNATIVE_ADDRESS[ChainId.FUSE], 18, 'WFUSE', 'Wrapped Fuse'),
+  [ChainId.CRONOS]: new Token(ChainId.CRONOS, WNATIVE_ADDRESS[ChainId.CRONOS], 18, 'WCRO', 'Wrapped CRO'),
 }
