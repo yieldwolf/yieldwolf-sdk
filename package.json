@@ -1,16 +1,16 @@
 {
-  "name": "@sushiswap/sdk",
+  "name": "@yieldwolf/sdk",
   "license": "MIT",
-  "version": "5.0.0-canary.99",
-  "description": "🛠 An SDK for building applications on top of SushiSwap.",
+  "version": "1.0.0",
+  "description": "🛠 An SDK for building applications on top of YieldWolf.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/sushiswap/sushiswap-sdk",
+  "repository": "https://github.com/yieldwolf/yieldwolf-sdk",
   "keywords": [
-    "sushiswap",
+    "yieldwolf",
     "ethereum",
     "sdk"
   ],
