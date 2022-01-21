@@ -1,3 +1,4 @@
+import { Moonbeam } from 'entities/Native/Moonbeam'
 import {
   Avalanche,
   Binance,
@@ -44,4 +45,5 @@ export const NATIVE = {
   [ChainId.MOONRIVER]: Movr.onChain(ChainId.MOONRIVER),
   [ChainId.FUSE]: Fuse.onChain(ChainId.FUSE),
   [ChainId.CRONOS]: Cronos.onChain(ChainId.CRONOS),
+  [ChainId.MOONBEAM]: Moonbeam.onChain(ChainId.MOONBEAM),
 }

@@ -17,6 +17,7 @@ export const USDC: TokenMap = {
   [ChainId.ARBITRUM]: new Token(ChainId.ARBITRUM, USDC_ADDRESS[ChainId.ARBITRUM], 6, 'USDC', 'USD Coin'),
   [ChainId.MOONRIVER]: new Token(ChainId.MOONRIVER, USDC_ADDRESS[ChainId.MOONRIVER], 6, 'USDC', 'USD Coin'),
   [ChainId.CRONOS]: new Token(ChainId.CRONOS, USDC_ADDRESS[ChainId.CRONOS], 6, 'USDC', 'USD Coin'),
+  [ChainId.MOONBEAM]: new Token(ChainId.MOONBEAM, USDC_ADDRESS[ChainId.MOONBEAM], 6, 'USDC', 'USD Coin'),
 }
 
 export const USD: TokenMap = {
@@ -131,4 +132,5 @@ export const WNATIVE: TokenMap = {
   ),
   [ChainId.FUSE]: new Token(ChainId.FUSE, WNATIVE_ADDRESS[ChainId.FUSE], 18, 'WFUSE', 'Wrapped Fuse'),
   [ChainId.CRONOS]: new Token(ChainId.CRONOS, WNATIVE_ADDRESS[ChainId.CRONOS], 18, 'WCRO', 'Wrapped CRO'),
+  [ChainId.MOONBEAM]: new Token(ChainId.MOONBEAM, WNATIVE_ADDRESS[ChainId.MOONBEAM], 18, 'WCRO', 'Wrapped CRO'),
 }
