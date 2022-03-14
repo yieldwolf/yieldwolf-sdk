@@ -1,4 +1,3 @@
-import { Moonbeam } from 'entities/Native/Moonbeam'
 import {
   Avalanche,
   Binance,
@@ -10,6 +9,8 @@ import {
   Harmony,
   Heco,
   Matic,
+  Metis,
+  Moonbeam,
   Movr,
   Okex,
   Palm,
@@ -46,4 +47,5 @@ export const NATIVE = {
   [ChainId.FUSE]: Fuse.onChain(ChainId.FUSE),
   [ChainId.CRONOS]: Cronos.onChain(ChainId.CRONOS),
   [ChainId.MOONBEAM]: Moonbeam.onChain(ChainId.MOONBEAM),
+  [ChainId.METIS]: Metis.onChain(ChainId.METIS),
 }
