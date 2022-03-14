@@ -18,7 +18,7 @@ function getPool(tokens: any, t0: number, t1: number, price: number[], reserve: 
     address: `pool-${t0}-${t1}-${reserve}-${fee}`,
     reserve0: BigNumber.from(reserve),
     reserve1: BigNumber.from(Math.round(reserve / (price[t1] / price[t0]) - imbalance)),
-    fee
+    fee,
   })
 }
 
@@ -26,7 +26,7 @@ function getPool(tokens: any, t0: number, t1: number, price: number[], reserve: 
 const price = [1, 1, 1, 1, 1]
 const tokens = price.map((_, i) => ({
   name: '' + (i + 1),
-  address: 'abcd'
+  address: 'abcd',
 }))
 
 const testPool0_1 = getPool(tokens, 0, 1, price, 1_500_0)
@@ -41,7 +41,7 @@ const testPools = [testPool0_1, testPool0_2, testPool1_3, testPool2_3, testPool1
 const price2 = [1, 2, 2.2, 15, 0.01]
 const tokens2 = price2.map((_, i) => ({
   name: '' + (i + 1),
-  address: 'abcd'
+  address: 'abcd',
 }))
 
 const testPool0_1_2 = getPool(tokens2, 0, 1, price2, 1_500_0)
@@ -95,19 +95,15 @@ describe('Multirouting for bridge topology', () => {
   })
 
   it('Special case for _one_line_ coverage', () => {
-    const res = findMultiRouting(tokens[0], tokens[3], 10000, testPools, tokens[2], gasPrice, [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      12
-    ])
+    const res = findMultiRouting(
+      tokens[0],
+      tokens[3],
+      10000,
+      testPools,
+      tokens[2],
+      gasPrice,
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
+    )
 
     expect(res).toBeDefined()
     expect(res?.status).toEqual(RouteStatus.Success)
@@ -118,7 +114,7 @@ describe('Multirouting for bridge topology', () => {
 
   it('Varios step number check', () => {
     const steps = [1, 2, 3, 5, 10, 30, 100, 300, 1000]
-    steps.forEach(s => {
+    steps.forEach((s) => {
       const res = findMultiRouting(tokens[0], tokens[3], 10000, testPools, tokens[2], gasPrice, s)
       //console.log(s, res?.amountOut);
       expect(res).toBeDefined()
@@ -142,7 +138,7 @@ describe('Multirouting for bridge topology', () => {
 
   it('Varios step number check for not equal prices', () => {
     const steps = [1, 2, 3, 5, 10, 30, 100, 300, 1000]
-    steps.forEach(s => {
+    steps.forEach((s) => {
       const res = findMultiRouting(tokens2[0], tokens2[3], 10000, testPools2, tokens2[2], gasPrice, s)
       //console.log(s, res?.amountOut);
       expect(res).toBeDefined()

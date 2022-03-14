@@ -8,7 +8,7 @@ import {
   MultiRoute,
   RouteStatus,
   RouteLeg,
-  RHybridPool
+  RHybridPool,
 } from '../src/types/MultiRouterTypes'
 import { getBigNumber } from '../src/utils/MultiRouterMath'
 import { checkRouteResult } from './snapshots/snapshot'
@@ -69,7 +69,7 @@ function getPoolFee(rnd: () => number) {
   const cmd = choice(rnd, {
     0: 1,
     1: 1,
-    2: 1
+    2: 1,
   })
   return fees[parseInt(cmd)]
 }
@@ -112,7 +112,7 @@ function getCPPool(rnd: () => number, t0: RToken, t1: RToken, price: number) {
     address: `pool cp ${t0.name} ${t1.name} ${reserve0} ${price} ${fee}`,
     reserve0: getBigNumber(undefined, reserve0),
     reserve1: getBigNumber(undefined, reserve1),
-    fee
+    fee,
   })
 }
 
@@ -150,7 +150,7 @@ function getHybridPool(rnd: () => number, t0: RToken, t1: RToken) {
     reserve0: getBigNumber(undefined, reserve0),
     reserve1: getBigNumber(undefined, reserve1),
     fee,
-    A
+    A,
   })
 }
 
@@ -206,7 +206,7 @@ function createNetwork(rnd: () => number, tokenNumber: number, density: number):
     tokens,
     prices,
     pools,
-    gasPrice: GAS_PRICE
+    gasPrice: GAS_PRICE,
   }
 }
 
@@ -216,7 +216,7 @@ function expectToBeClose(a: number, b: number, max: number) {
 
 function getTokenPools(network: Network): Map<RToken, Pool[]> {
   const tokenPools = new Map<RToken, Pool[]>()
-  network.pools.forEach(p => {
+  network.pools.forEach((p) => {
     const pools0 = tokenPools.get(p.token0)
     if (pools0) {
       pools0.push(p)
@@ -242,7 +242,7 @@ function getAllConnectedTokens(start: RToken, tokenPools: Map<RToken, Pool[]>): 
       continue
     }
     connected.add(token)
-    tokenPools.get(token)?.forEach(p => {
+    tokenPools.get(token)?.forEach((p) => {
       const token2 = token == p.token0 ? p.token1 : p.token0
       nextTokens.push(token2)
     })
@@ -282,7 +282,7 @@ function checkRoute(
 
   // gasSpent checks
   const poolMap = new Map<string, Pool>()
-  network.pools.forEach(p => poolMap.set(p.address, p))
+  network.pools.forEach((p) => poolMap.set(p.address, p))
   const expectedGasSpent = route.legs.reduce((a, b) => a + (poolMap.get(b.address)?.swapGasCost as number), 0)
   expect(route.gasSpent).toEqual(expectedGasSpent)
 
@@ -301,7 +301,7 @@ function checkRoute(
   if (route.status !== RouteStatus.NoWay) expect(route.legs.length).toBeGreaterThan(0)
   const usedPools = new Map<string, boolean>()
   const usedTokens = new Map<RToken, RouteLeg[]>()
-  route.legs.forEach(l => {
+  route.legs.forEach((l) => {
     expect(usedPools.get(l.address)).toBeUndefined()
     usedPools.set(l.address, true)
     const pool = poolMap.get(l.address) as Pool
@@ -313,11 +313,11 @@ function checkRoute(
   usedTokens.forEach((legs, t) => {
     if (t === from) {
       expect(legs.length).toBeGreaterThan(0)
-      expect(legs.every(l => l.token === from)).toBeTruthy()
+      expect(legs.every((l) => l.token === from)).toBeTruthy()
       expect(legs[legs.length - 1].swapPortion).toEqual(1)
     } else if (t === to) {
       expect(legs.length).toBeGreaterThan(0)
-      expect(legs.some(l => l.token === to)).toBeFalsy()
+      expect(legs.some((l) => l.token === to)).toBeFalsy()
     } else {
       expect(legs.length).toBeGreaterThanOrEqual(2)
       expect(legs[0].token).not.toEqual(t)
@@ -325,7 +325,7 @@ function checkRoute(
       expect(legs[legs.length - 1].swapPortion).toEqual(1)
       let inputFlag = true
       let absolutePortion = 0
-      legs.forEach(l => {
+      legs.forEach((l) => {
         if (l.token !== t) {
           expect(inputFlag).toBeTruthy()
         } else {
@@ -344,9 +344,9 @@ function checkRoute(
 // @ts-ignore
 function exportNetwork(network: Network, from: RToken, to: RToken, route: MultiRoute) {
   const allPools = new Map<string, Pool>()
-  network.pools.forEach(p => allPools.set(p.address, p))
+  network.pools.forEach((p) => allPools.set(p.address, p))
   const usedPools = new Map<string, boolean>()
-  route.legs.forEach(l => usedPools.set(l.address, l.token === allPools.get(l.address)?.token0))
+  route.legs.forEach((l) => usedPools.set(l.address, l.token === allPools.get(l.address)?.token0))
 
   function edgeStyle(p: Pool) {
     const u = usedPools.get(p.address)
@@ -362,10 +362,10 @@ function exportNetwork(network: Network, from: RToken, to: RToken, route: MultiR
   }
 
   const nodes = `var nodes = new vis.DataSet([
-    ${network.tokens.map(t => `{ id: ${t.name}, label: "${nodeLabel(t)}"}`).join(',\n\t\t')}
+    ${network.tokens.map((t) => `{ id: ${t.name}, label: "${nodeLabel(t)}"}`).join(',\n\t\t')}
   ]);\n`
   const edges = `var edges = new vis.DataSet([
-    ${network.pools.map(p => `{ from: ${p.token0.name}, to: ${p.token1.name}${edgeStyle(p)}}`).join(',\n\t\t')}
+    ${network.pools.map((p) => `{ from: ${p.token0.name}, to: ${p.token1.name}${edgeStyle(p)}}`).join(',\n\t\t')}
   ]);\n`
   const data = `var data = {
       nodes: nodes,
@@ -390,7 +390,7 @@ const network = createNetwork(rnd, 20, 0.3)
 it('Token price calculation is correct', () => {
   const baseTokenIndex = 0
   const g = new Graph(network.pools, network.tokens[baseTokenIndex], network.gasPrice)
-  g.vertices.forEach(v => {
+  g.vertices.forEach((v) => {
     const tokenIndex = parseInt(v.token.name)
     if (tokenIndex === baseTokenIndex) {
       expectToBeClose(v.price, 1, 1e-10)
@@ -439,7 +439,7 @@ it(`Multirouter path quantity check`, () => {
     const amountIn = getRandom(rndInternal, 1e6, 1e24)
 
     let prevAmountOut = -1
-    steps.forEach(s => {
+    steps.forEach((s) => {
       const route = findMultiRouting(t0, t1, amountIn, network.pools, tBase, network.gasPrice, s)
       checkRoute(network, t0, t1, amountIn, tBase, network.gasPrice, route)
       expect(route.totalAmountOut).toBeGreaterThan(prevAmountOut / 1.001)

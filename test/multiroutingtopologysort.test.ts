@@ -20,11 +20,11 @@ function createTopology(t: Topology): [Graph, Vertice, Vertice] {
       type: PoolType.ConstantProduct,
       reserve0: bn,
       reserve1: bn,
-      fee: 0.003
+      fee: 0.003,
     })
   })
   const g = new Graph(pools, tokens[0], 0) // just a dummy
-  g.edges.forEach(e => {
+  g.edges.forEach((e) => {
     e.amountInPrevious = 1
     e.amountOutPrevious = 1
     const edge = t[1][parseInt(e.pool.address)]
@@ -51,7 +51,7 @@ function createCorrectTopology(t: Topology, paths: number): [Graph, Vertice, Ver
       type: PoolType.ConstantProduct,
       reserve0: bn,
       reserve1: bn,
-      fee: 0.003
+      fee: 0.003,
     })
   })
   const g = new Graph(pools, tokens[0], 0) // just a dummy
@@ -67,7 +67,7 @@ function createCorrectTopology(t: Topology, paths: number): [Graph, Vertice, Ver
 function generatePath(g: Graph, from: Vertice, to: Vertice, used: Set<Vertice>): Edge[] | undefined {
   if (from === to) return []
   used.add(from)
-  let edges = from.edges.filter(e => !used.has(from.getNeibour(e) as Vertice))
+  let edges = from.edges.filter((e) => !used.has(from.getNeibour(e) as Vertice))
   while (edges.length) {
     const r = Math.floor(rnd() * from.edges.length)
     const edge = from.edges[r]
@@ -79,7 +79,7 @@ function generatePath(g: Graph, from: Vertice, to: Vertice, used: Set<Vertice>):
 }
 function applyPath(p: Edge[], from: Vertice, to: Vertice) {
   let v = from
-  p.forEach(e => {
+  p.forEach((e) => {
     if (e.amountInPrevious == 0) {
       e.direction = v == e.vert0
       e.amountInPrevious = 1
@@ -117,8 +117,8 @@ it('Line topology', () => {
       [0, 1],
       [1, 2],
       [2, 3],
-      [3, 4]
-    ]
+      [3, 4],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -135,8 +135,8 @@ it('Verts after the last', () => {
       [0, 1],
       [1, 2],
       [2, 4],
-      [4, 3]
-    ]
+      [4, 3],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -155,8 +155,8 @@ it('Fork topology', () => {
       [2, 4],
       [1, 3],
       [3, 4],
-      [0, 4]
-    ]
+      [0, 4],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -173,8 +173,8 @@ it('Unreached verts', () => {
       [0, 1],
       [1, 4],
       [2, 3],
-      [3, 4]
-    ]
+      [3, 4],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -191,8 +191,8 @@ it('Dead end', () => {
       [0, 1],
       [1, 4],
       [0, 3],
-      [3, 2]
-    ]
+      [3, 2],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -208,8 +208,8 @@ it('Cycle from begin', () => {
       [1, 2],
       [2, 3],
       [3, 0],
-      [3, 4]
-    ]
+      [3, 4],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -225,8 +225,8 @@ it('Cycle not from begin', () => {
       [1, 2],
       [2, 3],
       [3, 4],
-      [3, 1]
-    ]
+      [3, 1],
+    ],
   ]
   const g = createTopology(topology)
   const res = g[0].topologySort(g[1], g[2])
@@ -315,7 +315,7 @@ function checkTopologySort(t: Topology) {
     // No way between start and end verts
     expect(res[1].length).toBeGreaterThan(0)
     const verts = new Set<number>()
-    res[1].forEach(e => verts.add(vertIndex(e)))
+    res[1].forEach((e) => verts.add(vertIndex(e)))
     expect(verts.has(vertIndex(g[1]))).toBeTruthy()
     expect(verts.has(vertIndex(g[2]))).toBeFalsy()
     const vertsReached = new Set<number>()
@@ -339,7 +339,7 @@ function checkTopologySort(t: Topology) {
   if (res[0] === 3) {
     expect(res[1].length).toBeGreaterThan(0)
     const verts = new Set<number>()
-    res[1].forEach(e => verts.add(vertIndex(e)))
+    res[1].forEach((e) => verts.add(vertIndex(e)))
     expect(verts.has(vertIndex(g[1]))).toBeFalsy()
     expect(verts.has(vertIndex(g[2]))).toBeFalsy()
     const vertsReached = new Set<number>()
@@ -370,8 +370,8 @@ it('test test', () => {
       [1, 2],
       [2, 3],
       [3, 4],
-      [3, 1]
-    ]
+      [3, 1],
+    ],
   ]
   const res = checkTopologySort(topology)
   expect(res).toEqual(0)

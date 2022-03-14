@@ -20,10 +20,10 @@ export function checkRouteResult(id: string, amountOut: number) {
       data = ''
     }
     const records = data.split('\n')
-    records.forEach(r => {
+    records.forEach((r) => {
       if (r.trim() !== '') {
         // @ts-ignore
-        const [_, id, out] = r.split('"').map(e => e.trim())
+        const [_, id, out] = r.split('"').map((e) => e.trim())
         snapshotMap.set(id, parseFloat(out))
       }
     })
@@ -39,7 +39,7 @@ export function checkRouteResult(id: string, amountOut: number) {
     console.assert(increase >= -1e-4, `Routing result ${id} ${increase}%`)
     fs.writeFileSync(fullFileName(REPORT_FILE), `"${id}": ${prevOut} -> ${amountOut} (${increase}%)\n`, {
       encoding: 'utf8',
-      flag: newReportWasStarted ? 'a' : 'w'
+      flag: newReportWasStarted ? 'a' : 'w',
     })
     newReportWasStarted = true
   }
