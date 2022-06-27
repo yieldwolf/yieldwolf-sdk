@@ -1,5 +1,5 @@
-import { BENTOBOX_ADDRESS, STOP_LIMIT_ORDER_ADDRESS } from '../constants'
-import { bentoTypes, name, types } from '../types'
+import { STOP_LIMIT_ORDER_ADDRESS } from '../constants'
+import { name, types } from '../types'
 
 import { ChainId } from '../enums'
 import { SigningKey } from '@ethersproject/signing-key'
@@ -53,20 +53,6 @@ export const getTypedData = (message: Message, chainId: ChainId) => {
   return { types, primaryType: 'LimitOrder', domain, message }
 }
 
-export const getTypedDataBento = (message: BentoApprovalMessage, chainId: ChainId) => {
-  let domain: Domain = {
-    name: 'BentoBox V1',
-    chainId: chainId,
-    verifyingContract: BENTOBOX_ADDRESS[chainId],
-  }
-  return {
-    types: bentoTypes,
-    primaryType: 'SetMasterContractApproval',
-    domain,
-    message,
-  }
-}
-
 export const getTypeHash = (typedData: any) => {
   let message = getMessage(typedData, true).toString('hex')
   return `0x${message}`
@@ -88,32 +74,4 @@ export const getSignatureWithProvider = async (
   const signature = await provider.send('eth_signTypedData_v4', [message.maker, JSON.stringify(typedData)])
   const { v, r, s } = splitSignature(signature)
   return { v, r, s }
-}
-
-export const getSignatureWithProviderBentobox = async (
-  message: BentoApprovalMessage,
-  chainId: ChainId,
-  provider: Web3Provider
-): Promise<{ v: number; r: string; s: string }> => {
-  const typedData = getTypedDataBento(message, chainId)
-  const signature = await provider.send('eth_signTypedData_v4', [message.user, JSON.stringify(typedData)])
-  const { v, r, s } = splitSignature(signature)
-  return { v, r, s }
-}
-
-export const getSignatureBento = async (bentoApproval: BentoApprovalMessage, chainId: ChainId, privateKey: string) => {
-  let domain: Domain = {
-    name: 'BentoBox V1',
-    chainId: chainId,
-    verifyingContract: BENTOBOX_ADDRESS[chainId],
-  }
-  return sign(
-    {
-      types: bentoTypes,
-      primaryType: 'SetMasterContractApproval',
-      domain,
-      message: bentoApproval,
-    },
-    privateKey
-  )
 }
