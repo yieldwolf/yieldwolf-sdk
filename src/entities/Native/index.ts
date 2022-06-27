@@ -1,4 +1,5 @@
 // Native exports
+export { Aurora } from './Aurora'
 export { Avalanche } from './Avalanche'
 export { Binance } from './Binance'
 export { Celo } from './Celo'

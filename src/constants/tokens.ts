@@ -19,6 +19,8 @@ export const USDC: TokenMap = {
   [ChainId.CRONOS]: new Token(ChainId.CRONOS, USDC_ADDRESS[ChainId.CRONOS], 6, 'USDC', 'USD Coin'),
   [ChainId.MOONBEAM]: new Token(ChainId.MOONBEAM, USDC_ADDRESS[ChainId.MOONBEAM], 6, 'USDC', 'USD Coin'),
   [ChainId.METIS]: new Token(ChainId.METIS, USDC_ADDRESS[ChainId.METIS], 6, 'USDC', 'USD Coin'),
+  [ChainId.OPTIMISM]: new Token(ChainId.OPTIMISM, USDC_ADDRESS[ChainId.OPTIMISM], 6, 'USDC', 'USD Coin'),
+  [ChainId.AURORA]: new Token(ChainId.AURORA, USDC_ADDRESS[ChainId.AURORA], 6, 'USDC', 'USD Coin'),
 }
 
 export const USD: TokenMap = {
@@ -49,6 +51,8 @@ export const WETH9: TokenMap = {
   [ChainId.XDAI]: new Token(ChainId.XDAI, WETH9_ADDRESS[ChainId.XDAI], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.AVALANCHE]: new Token(ChainId.AVALANCHE, WETH9_ADDRESS[ChainId.AVALANCHE], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.METIS]: new Token(ChainId.METIS, WETH9_ADDRESS[ChainId.METIS], 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.OPTIMISM]: new Token(ChainId.OPTIMISM, WETH9_ADDRESS[ChainId.OPTIMISM], 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.AURORA]: new Token(ChainId.AURORA, WETH9_ADDRESS[ChainId.AURORA], 18, 'WETH', 'Wrapped Ether'),
 }
 
 export const WNATIVE: TokenMap = {
@@ -136,4 +140,6 @@ export const WNATIVE: TokenMap = {
   [ChainId.CRONOS]: new Token(ChainId.CRONOS, WNATIVE_ADDRESS[ChainId.CRONOS], 18, 'WCRO', 'Wrapped CRO'),
   [ChainId.MOONBEAM]: new Token(ChainId.MOONBEAM, WNATIVE_ADDRESS[ChainId.MOONBEAM], 18, 'WCRO', 'Wrapped CRO'),
   [ChainId.METIS]: new Token(ChainId.METIS, WNATIVE_ADDRESS[ChainId.METIS], 18, 'METIS', 'METIS'),
+  [ChainId.OPTIMISM]: WETH9[ChainId.OPTIMISM],
+  [ChainId.AURORA]: new Token(ChainId.AURORA, WNATIVE_ADDRESS[ChainId.AURORA], 18, 'AURORA', 'Aurora'),
 }

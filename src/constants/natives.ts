@@ -1,4 +1,5 @@
 import {
+  Aurora,
   Avalanche,
   Binance,
   Celo,
@@ -48,4 +49,6 @@ export const NATIVE = {
   [ChainId.CRONOS]: Cronos.onChain(ChainId.CRONOS),
   [ChainId.MOONBEAM]: Moonbeam.onChain(ChainId.MOONBEAM),
   [ChainId.METIS]: Metis.onChain(ChainId.METIS),
+  [ChainId.OPTIMISM]: Ether.onChain(ChainId.OPTIMISM),
+  [ChainId.AURORA]: Aurora.onChain(ChainId.AURORA),
 }
