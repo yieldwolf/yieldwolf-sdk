@@ -15,7 +15,7 @@ import {
   Movr,
   Okex,
   Palm,
-  xDai,
+  Gnosis,
 } from '../entities/Native'
 import { ChainId } from '../enums'
 
@@ -29,7 +29,7 @@ export const NATIVE = {
   [ChainId.FANTOM_TESTNET]: Fantom.onChain(ChainId.FANTOM_TESTNET),
   [ChainId.MATIC]: Matic.onChain(ChainId.MATIC),
   [ChainId.MATIC_TESTNET]: Matic.onChain(ChainId.MATIC_TESTNET),
-  [ChainId.XDAI]: xDai.onChain(ChainId.XDAI),
+  [ChainId.GNOSIS]: Gnosis.onChain(ChainId.GNOSIS),
   [ChainId.BSC]: Binance.onChain(ChainId.BSC),
   [ChainId.BSC_TESTNET]: Binance.onChain(ChainId.BSC_TESTNET),
   // [ChainId.MOONBEAM_TESTNET]: Currency.GLMR,
