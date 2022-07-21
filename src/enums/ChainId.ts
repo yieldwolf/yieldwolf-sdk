@@ -8,6 +8,7 @@ export enum ChainId {
   MATIC_TESTNET = 80001,
   FANTOM = 250,
   FANTOM_TESTNET = 4002,
+  TOMBCHAIN = 6969,
   GNOSIS = 100,
   BSC = 56,
   BSC_TESTNET = 97,

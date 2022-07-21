@@ -7,6 +7,7 @@ import {
   Ether,
   Fantom,
   Fuse,
+  Gnosis,
   Harmony,
   Heco,
   Matic,
@@ -15,7 +16,7 @@ import {
   Movr,
   Okex,
   Palm,
-  Gnosis,
+  Tombchain,
 } from '../entities/Native'
 import { ChainId } from '../enums'
 
@@ -27,6 +28,7 @@ export const NATIVE = {
   [ChainId.KOVAN]: Ether.onChain(ChainId.KOVAN),
   [ChainId.FANTOM]: Fantom.onChain(ChainId.FANTOM),
   [ChainId.FANTOM_TESTNET]: Fantom.onChain(ChainId.FANTOM_TESTNET),
+  [ChainId.TOMBCHAIN]: Tombchain.onChain(ChainId.TOMBCHAIN),
   [ChainId.MATIC]: Matic.onChain(ChainId.MATIC),
   [ChainId.MATIC_TESTNET]: Matic.onChain(ChainId.MATIC_TESTNET),
   [ChainId.GNOSIS]: Gnosis.onChain(ChainId.GNOSIS),

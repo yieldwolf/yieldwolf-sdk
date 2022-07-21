@@ -9,6 +9,7 @@ export const USDC: TokenMap = {
   [ChainId.KOVAN]: new Token(ChainId.KOVAN, USDC_ADDRESS[ChainId.KOVAN], 6, 'USDC', 'USD Coin'),
   [ChainId.MATIC]: new Token(ChainId.MATIC, USDC_ADDRESS[ChainId.MATIC], 6, 'USDC', 'USD Coin'),
   [ChainId.FANTOM]: new Token(ChainId.FANTOM, USDC_ADDRESS[ChainId.FANTOM], 6, 'USDC', 'USD Coin'),
+  [ChainId.TOMBCHAIN]: new Token(ChainId.TOMBCHAIN, USDC_ADDRESS[ChainId.TOMBCHAIN], 6, 'USDC', 'USD Coin'),
   [ChainId.BSC]: new Token(ChainId.BSC, USDC_ADDRESS[ChainId.BSC], 18, 'USDC', 'USD Coin'),
   [ChainId.HARMONY]: new Token(ChainId.HARMONY, USDC_ADDRESS[ChainId.HARMONY], 6, 'USDC', 'USD Coin'),
   [ChainId.HECO]: new Token(ChainId.HECO, USDC_ADDRESS[ChainId.HECO], 6, 'USDC', 'USD Coin'),
@@ -44,6 +45,7 @@ export const WETH9: TokenMap = {
   ),
   [ChainId.BSC]: new Token(ChainId.BSC, WETH9_ADDRESS[ChainId.BSC], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.FANTOM]: new Token(ChainId.FANTOM, WETH9_ADDRESS[ChainId.FANTOM], 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.TOMBCHAIN]: new Token(ChainId.TOMBCHAIN, WETH9_ADDRESS[ChainId.TOMBCHAIN], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.MATIC]: new Token(ChainId.MATIC, WETH9_ADDRESS[ChainId.MATIC], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.OKEX]: new Token(ChainId.OKEX, WETH9_ADDRESS[ChainId.OKEX], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.HECO]: new Token(ChainId.HECO, WETH9_ADDRESS[ChainId.HECO], 18, 'WETH', 'Wrapped Ether'),
@@ -69,6 +71,7 @@ export const WNATIVE: TokenMap = {
     'FTM',
     'Wrapped FTM'
   ),
+  [ChainId.TOMBCHAIN]: new Token(ChainId.TOMBCHAIN, WNATIVE_ADDRESS[ChainId.TOMBCHAIN], 18, 'WFTM', 'Wrapped FTM'),
   [ChainId.MATIC]: new Token(ChainId.MATIC, WNATIVE_ADDRESS[ChainId.MATIC], 18, 'WMATIC', 'Wrapped Matic'),
   [ChainId.MATIC_TESTNET]: new Token(
     ChainId.MATIC_TESTNET,
