@@ -4,6 +4,7 @@ import {
   Binance,
   Celo,
   Cronos,
+  Doge,
   Ether,
   Fantom,
   Fuse,
@@ -53,4 +54,5 @@ export const NATIVE = {
   [ChainId.METIS]: Metis.onChain(ChainId.METIS),
   [ChainId.OPTIMISM]: Ether.onChain(ChainId.OPTIMISM),
   [ChainId.AURORA]: Aurora.onChain(ChainId.AURORA),
+  [ChainId.DOGE]: Doge.onChain(ChainId.DOGE),
 }

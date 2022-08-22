@@ -22,6 +22,7 @@ export const USDC: TokenMap = {
   [ChainId.METIS]: new Token(ChainId.METIS, USDC_ADDRESS[ChainId.METIS], 6, 'USDC', 'USD Coin'),
   [ChainId.OPTIMISM]: new Token(ChainId.OPTIMISM, USDC_ADDRESS[ChainId.OPTIMISM], 6, 'USDC', 'USD Coin'),
   [ChainId.AURORA]: new Token(ChainId.AURORA, USDC_ADDRESS[ChainId.AURORA], 6, 'USDC', 'USD Coin'),
+  [ChainId.DOGE]: new Token(ChainId.DOGE, USDC_ADDRESS[ChainId.DOGE], 6, 'USDC', 'USD Coin'),
 }
 
 export const USD: TokenMap = {
@@ -55,6 +56,7 @@ export const WETH9: TokenMap = {
   [ChainId.METIS]: new Token(ChainId.METIS, WETH9_ADDRESS[ChainId.METIS], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.OPTIMISM]: new Token(ChainId.OPTIMISM, WETH9_ADDRESS[ChainId.OPTIMISM], 18, 'WETH', 'Wrapped Ether'),
   [ChainId.AURORA]: new Token(ChainId.AURORA, WETH9_ADDRESS[ChainId.AURORA], 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.DOGE]: new Token(ChainId.DOGE, WETH9_ADDRESS[ChainId.DOGE], 18, 'WETH', 'Wrapped Ether'),
 }
 
 export const WNATIVE: TokenMap = {
@@ -145,4 +147,5 @@ export const WNATIVE: TokenMap = {
   [ChainId.METIS]: new Token(ChainId.METIS, WNATIVE_ADDRESS[ChainId.METIS], 18, 'METIS', 'METIS'),
   [ChainId.OPTIMISM]: WETH9[ChainId.OPTIMISM],
   [ChainId.AURORA]: new Token(ChainId.AURORA, WNATIVE_ADDRESS[ChainId.AURORA], 18, 'AURORA', 'Aurora'),
+  [ChainId.DOGE]: new Token(ChainId.DOGE, WNATIVE_ADDRESS[ChainId.DOGE], 18, 'WDOGE', 'Wrapped DOGE'),
 }
