@@ -121,6 +121,7 @@ export const ROUTER_ADDRESS: AddressMap = {
   [ChainId.METIS]: '0x81b9FA50D5f5155Ee17817C21702C3AE4780AD09', // Tethys
   [ChainId.OPTIMISM]: '',
   [ChainId.AURORA]: '',
+  [ChainId.DOGE]: '',
 }
 
 export const SUSHI_ADDRESS: AddressMap = {
