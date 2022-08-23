@@ -21,6 +21,7 @@ export const USDC_ADDRESS: AddressMap = {
   [ChainId.METIS]: '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21',
   [ChainId.OPTIMISM]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
   [ChainId.AURORA]: '0xB12BFcA5A55806AaF64E99521918A4bf0fC40802',
+  [ChainId.DOGE]: '0x765277EebeCA2e31912C9946eAe1021199B39C61',
 }
 
 export const USD_ADDRESS: AddressMap = {
@@ -44,6 +45,7 @@ export const USD_ADDRESS: AddressMap = {
   [ChainId.METIS]: USDC_ADDRESS[ChainId.METIS],
   [ChainId.OPTIMISM]: USDC_ADDRESS[ChainId.OPTIMISM],
   [ChainId.AURORA]: USDC_ADDRESS[ChainId.AURORA],
+  [ChainId.DOGE]: USDC_ADDRESS[ChainId.DOGE],
 }
 
 export const FACTORY_ADDRESS: AddressMap = {
@@ -81,6 +83,7 @@ export const FACTORY_ADDRESS: AddressMap = {
   [ChainId.METIS]: '0x2CdFB20205701FF01689461610C9F321D1d00F80', // Tethys
   [ChainId.OPTIMISM]: '',
   [ChainId.AURORA]: '',
+  [ChainId.DOGE]: '',
 }
 
 export const ROUTER_ADDRESS: AddressMap = {
@@ -146,6 +149,7 @@ export const SUSHI_ADDRESS: AddressMap = {
   [ChainId.METIS]: '',
   [ChainId.OPTIMISM]: '',
   [ChainId.AURORA]: '',
+  [ChainId.DOGE]: '',
 }
 
 export const MASTERCHEF_ADDRESS: AddressMap = {
@@ -231,6 +235,7 @@ export const WETH9_ADDRESS: AddressMap = {
   [ChainId.METIS]: '0x420000000000000000000000000000000000000A',
   [ChainId.OPTIMISM]: '0x4200000000000000000000000000000000000006',
   [ChainId.AURORA]: '0xC9BdeEd33CD01541e1eeD10f90519d2C06Fe3feB',
+  [ChainId.DOGE]: '0xB44a9B6905aF7c801311e8F4E76932ee959c663C',
 }
 
 export const WNATIVE_ADDRESS: AddressMap = {
@@ -267,6 +272,7 @@ export const WNATIVE_ADDRESS: AddressMap = {
   [ChainId.METIS]: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
   [ChainId.OPTIMISM]: WETH9_ADDRESS[ChainId.OPTIMISM],
   [ChainId.AURORA]: '0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79',
+  [ChainId.DOGE]: '0xB7ddC6414bf4F5515b52D8BdD69973Ae205ff101',
 }
 
 export const ENS_REGISTRAR_ADDRESS: AddressMap = {
@@ -308,4 +314,5 @@ export const MULTICALL2_ADDRESS: AddressMap = {
   [ChainId.METIS]: '0xc39aBB6c4451089dE48Cffb013c39d3110530e5C',
   [ChainId.OPTIMISM]: '0x04b703d9b6433f84F1ef968462aA3CE52AE89334',
   [ChainId.AURORA]: '0x49eb1F160e167aa7bA96BdD88B6C1f2ffda5212A',
+  [ChainId.DOGE]: '0x62D27b8E8Bd1dBa6c163B4758Dedc2A384BF5aE4',
 }

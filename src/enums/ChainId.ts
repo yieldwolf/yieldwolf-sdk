@@ -33,4 +33,5 @@ export enum ChainId {
   METIS = 1088,
   OPTIMISM = 10,
   AURORA = 1313161554,
+  DOGE = 2000,
 }
